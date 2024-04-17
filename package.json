@@ -1,0 +1,42 @@
+{
+	"name": "syncopener-vscode",
+	"displayName": "SyncOpener",
+	"description": "Link directories to open files of the same name with a single click.",
+	"version": "0.0.1",
+	"engines": {
+	  "vscode": "^1.87.0"
+	},
+	"categories": [
+	  "Other"
+	],
+	"activationEvents": [
+	  "onLanguage:typescript",
+	  "onLanguage:javascript",
+	  "onLanguage:typescriptreact",
+	  "onLanguage:javascriptreact"
+	],
+	"main": "./extension.js",
+	"scripts": {
+	  "lint": "eslint .",
+	  "pretest": "npm run lint",
+	  "test": "vscode-test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ollypittaway/syncopener"
+	},
+	"keywords": [
+		"sync", "file", "open", "vscode", "syncopener", "sync opener"
+	],
+	"license": "MIT",
+	"devDependencies": {
+	  "@types/vscode": "^1.87.0",
+	  "@types/mocha": "^10.0.6",
+	  "@types/node": "18.x",
+	  "eslint": "^8.57.0",
+	  "typescript": "^5.3.3",
+	  "@vscode/test-cli": "^0.0.8",
+	  "@vscode/test-electron": "^2.3.9"
+	}
+  }
+  
