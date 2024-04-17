@@ -9,6 +9,7 @@
 	"categories": [
 	  "Other"
 	],
+	"icon": "icon.webp",
 	"activationEvents": [
 	  "onLanguage:typescript",
 	  "onLanguage:javascript",
