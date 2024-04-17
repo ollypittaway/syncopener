@@ -2,7 +2,7 @@ const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 
-const outputChannel = vscode.window.createOutputChannel("My Extension");
+const outputChannel = vscode.window.createOutputChannel("SyncOpener");
 
 async function activate(context) {
 	let disposable = vscode.workspace.onDidOpenTextDocument(async (document) => {
