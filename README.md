@@ -63,12 +63,12 @@ If specified, the extension transformation will apply when switching between fil
 
 For files with the same extension the `extension` can be omitted. This can be seen here:
 
-![](https://github.com/ollypittaway/syncopener/SameExtension.gif)
+![](https://github.com/ollypittaway/syncopener/blob/main/SameExtension.gif)
 
 
 For files with different extensions (e.g .jsx and .scss) define the `extension` for both files in the JSON like below:
 
-![](https://github.com/ollypittaway/syncopener/DifferentExtension.gif)
+![](https://github.com/ollypittaway/syncopener/blob/main/DifferentExtension.gif)
 
 
 ### Usage
