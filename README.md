@@ -53,7 +53,6 @@ The `.syncopener` file should contain an array of objects, each representing a p
 ]
 ```
 
-### JSON Structure
 
 - **path:**
 The relative path from the root of the workspace to the directory.
