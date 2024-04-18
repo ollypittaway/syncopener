@@ -34,20 +34,20 @@ The `.syncopener` file should contain an array of objects, each representing a p
 [
     {
         "directory1": {
-            "path": "path/to/first/directory",
+            "path": "/path/to/first/directory",
             "extension": ".js"
         },
         "directory2": {
-            "path": "path/to/second/directory",
+            "path": "/path/to/second/directory",
             "extension": ".ts"
         }
     },
     {
         "directory1": {
-            "path": "path/to/third/directory"
+            "path": "/path/to/third/directory"
         },
         "directory2": {
-            "path": "path/to/fourth/directory"
+            "path": "/path/to/fourth/directory"
         }
     }
 ]
