@@ -50,8 +50,26 @@ The `.syncopener` file should contain an array of objects, each representing a p
 ]
 ```
 
-- **path:** The relative path from the root of the workspace to the directory.
-- **extension (optional):** If specified, the extension transformation will apply when switching between files in these directories. This is useful when working on Front-End styling. For example: link the initial directory with ".jsx" extension and the second directory as ".scss" and it will open the files simulatenously.
+### JSON Structure
+
+- **path:**
+The relative path from the root of the workspace to the directory.
+
+- **extension (optional):** 
+If specified, the extension transformation will apply when switching between files in these directories. This is useful when working on Front-End styling. For example: link the initial directory with ".jsx" extension and the second directory as ".scss" and it will open the files simulatenously. **Files must be called the same other than the extension.**
+
+
+### Examples
+
+For files with the same extension the `extension` can be omitted. This can be seen here:
+
+![](https://github.com/ollypittaway/syncopener/SameExtension.gif)
+
+
+For files with different extensions (e.g .jsx and .scss) define the `extension` for both files in the JSON like below:
+
+![](https://github.com/ollypittaway/syncopener/DifferentExtension.gif)
+
 
 ### Usage
 

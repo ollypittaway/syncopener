@@ -2,6 +2,7 @@
 	"name": "syncopener-vscode",
 	"displayName": "SyncOpener",
 	"description": "Link directories to open files of the same name with a single click.",
+	"publisher": "Pittawaydev",
 	"version": "0.0.1",
 	"engines": {
 	  "vscode": "^1.87.0"
