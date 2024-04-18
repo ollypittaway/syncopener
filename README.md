@@ -1,4 +1,4 @@
-# SyncOpener
+![](https://github.com/ollypittaway/syncopener/blob/main/BannerLogo.jpg)
 
 Enhance your coding efficiency with SyncOpener, a Visual Studio Code extension designed to streamline your workflow. This tool automatically detects and opens related files across different directories based on your predefined settings. Perfect for projects with files that have mirror or counterpart versions in various locations, SyncOpener ensures you can effortlessly switch between file pairs with different extensions. Simplify your development process by keeping essential files in sync and readily accessible, all within your coding environment.
 
