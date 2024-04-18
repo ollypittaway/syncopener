@@ -2,11 +2,13 @@
 
 Enhance your coding efficiency with SyncOpener, a Visual Studio Code extension designed to streamline your workflow. This tool automatically detects and opens related files across different directories based on your predefined settings. Perfect for projects with files that have mirror or counterpart versions in various locations, SyncOpener ensures you can effortlessly switch between file pairs with different extensions. Simplify your development process by keeping essential files in sync and readily accessible, all within your coding environment.
 
+
 ## Features
 
 - **Automatic File Detection:** Opens related files based on the configurations specified in the `.syncopener` file.
 - **Support for Multiple Extensions:** Works with a variety of file extensions including `.ts`, `.tsx`, `.js`, `.jsx`, `.html`, `.css`, and `.scss`.
 - **Workspace Integration:** Seamlessly integrates with your Visual Studio Code workspace, supporting projects with multiple directories.
+
 
 ## Getting Started
 
@@ -19,7 +21,8 @@ To install SyncOpener, follow these steps:
 3. Search for "SyncOpener".
 4. Click on the install button next to the extension.
 
-### Configuration
+
+## Configuration
 
 To configure SyncOpener, you need to create a `.syncopener` file in the root of your workspace. This JSON-formatted file specifies pairs of directories to sync and optional specific extensions for the files within those directories.
 
@@ -59,7 +62,7 @@ The relative path from the root of the workspace to the directory.
 If specified, the extension transformation will apply when switching between files in these directories. This is useful when working on Front-End styling. For example: link the initial directory with ".jsx" extension and the second directory as ".scss" and it will open the files simulatenously. **Files must be called the same other than the extension.**
 
 
-### Examples
+## Examples
 
 For files with the same extension the `extension` can be omitted. This can be seen here:
 
@@ -71,14 +74,11 @@ For files with different extensions (e.g .jsx and .scss) define the `extension` 
 ![](https://github.com/ollypittaway/syncopener/blob/main/DifferentExtension.gif)
 
 
-### Usage
+## Usage
 
 Once SyncOpener is installed and configured, simply open a file that matches the criteria in your `.syncopener` configuration. SyncOpener will automatically detect and open the corresponding file in the paired directory, allowing you to work across files seamlessly.
+
 
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-## Contact
-
-Project Link: [https://github.com/ollypittaway/syncopener](https://github.com/ollypittaway/syncopener)
