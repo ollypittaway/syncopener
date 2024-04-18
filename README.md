@@ -1,6 +1,20 @@
-![](https://github.com/ollypittaway/syncopener/blob/main/ThinBannerLogo.jpg)
+<h3 align="center">
+	<img align="center" src="branding/CircleLogo.png" width="200">
+	<br/>
+	<br/>
+</h3>
 
-Enhance your coding efficiency with SyncOpener, a Visual Studio Code extension designed to streamline your workflow. This tool automatically detects and opens related files across different directories based on your predefined settings. Perfect for projects with files that have mirror or counterpart versions in various locations, SyncOpener ensures you can effortlessly switch between file pairs with different extensions. Simplify your development process by keeping essential files in sync and readily accessible, all within your coding environment.
+<h3 align="center">
+	Enhance your coding efficiency with SyncOpener, a Visual Studio Code extension designed to streamline your workflow. This tool automatically detects and opens related files across different directories based on your predefined settings. Perfect for projects with files that have mirror or counterpart versions in various locations, SyncOpener ensures you can effortlessly switch between file pairs with different extensions. Simplify your development process by keeping essential files in sync and readily accessible, all within your coding environment.
+	<br/>
+	<br/>
+</h3>
+
+<p align="center">
+	<img src="previews/MainPreview.gif">
+</p>
+
+
 
 
 ## Features
@@ -65,12 +79,16 @@ If specified, the extension transformation will apply when switching between fil
 
 For files with the same extension the `extension` can be omitted. This can be seen here:
 
-![](https://github.com/ollypittaway/syncopener/blob/main/SameExtension.gif)
+<p align="center">
+	<img src="previews/SameExtension.gif">
+</p>
 
 
 For files with different extensions (e.g .jsx and .scss) define the `extension` for both files in the JSON like below:
 
-![](https://github.com/ollypittaway/syncopener/blob/main/DifferentExtension.gif)
+<p align="center">
+	<img src="previews/DifferentExtension.gif">
+</p>
 
 
 ## Usage
