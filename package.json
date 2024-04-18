@@ -10,7 +10,7 @@
 	"categories": [
 	  "Other"
 	],
-	"icon": "SquareLogo.jpg",
+	"icon": "branding/CircleLogo.png",
 	"activationEvents": [
 	  "onLanguage:typescript",
 	  "onLanguage:javascript",
