@@ -12,10 +12,7 @@
 	],
 	"icon": "branding/CircleLogo.png",
 	"activationEvents": [
-	  "onLanguage:typescript",
-	  "onLanguage:javascript",
-	  "onLanguage:typescriptreact",
-	  "onLanguage:javascriptreact"
+		"workspaceContains:.syncopener"
 	],
 	"main": "./extension.js",
 	"scripts": {

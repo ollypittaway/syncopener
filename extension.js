@@ -5,6 +5,8 @@ const fs = require("fs");
 const outputChannel = vscode.window.createOutputChannel("SyncOpener");
 let isExtensionTriggered = false;
 
+outputChannel.appendLine("SyncOpener loaded.");
+
 function log(message) {
 	const timestamp = new Date().toLocaleTimeString();
 	outputChannel.appendLine(`[${timestamp}] ${message}`);
@@ -68,7 +70,9 @@ function convertFileName(fileName, sourceFormat, targetFormat, targetExtension) 
 }
 
 async function activate(context) {
+	log("SyncOpener activated.");
 	let disposable = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+		log("SyncOpener activated.");
 		if (isExtensionTriggered || !editor) {
 			return;
 		}
