@@ -99,11 +99,13 @@ async function activate(context) {
 		let documentName = document.uri.fsPath.replace(/\.git$/, "");
 		log(`Processing ${documentName}...`);
 
-		// Extract the extension from the document URI once, correctly handling dot files or hidden extensions
 		const fileExtension = path.extname(documentName);
 		if (![".ts", ".tsx", ".js", ".jsx", ".html", ".css", ".scss"].includes(fileExtension)) {
 			return;
 		}
+
+		// Save the active editor before any operations
+		const originalEditor = vscode.window.activeTextEditor;
 
 		for (const pair of directoryPairs) {
 			const directory1 = pair.directory1.path;
@@ -112,7 +114,7 @@ async function activate(context) {
 			if (!targetDirectory) continue;
 
 			const targetExtension = documentName.includes(directory1) ? pair.directory2.extension || fileExtension : pair.directory1.extension || fileExtension;
-			const openedFileName = path.basename(documentName, fileExtension); // Strip the extension correctly
+			const openedFileName = path.basename(documentName, fileExtension);
 			log(`Opened file name without extension: ${openedFileName}`);
 
 			const sourceFormat = detectFileNameType(openedFileName + fileExtension);
@@ -121,7 +123,7 @@ async function activate(context) {
 			const convertedFileName = convertFileName(openedFileName + fileExtension, sourceFormat, targetFormat, targetExtension);
 
 			const targetFilePath = path.join(rootPath, targetDirectory, convertedFileName);
-			log(`Trying to open file: ${targetFilePath}`); // Debug line to see what file path is being constructed
+			log(`Trying to open file: ${targetFilePath}`);
 
 			if (vscode.window.visibleTextEditors.some((editor) => editor.document.uri.fsPath === targetFilePath)) {
 				log(`File already open: ${targetFilePath}`);
@@ -131,12 +133,17 @@ async function activate(context) {
 			try {
 				isExtensionTriggered = true;
 				const targetDocument = await vscode.workspace.openTextDocument(vscode.Uri.file(targetFilePath));
-				await vscode.window.showTextDocument(targetDocument, { viewColumn: vscode.ViewColumn.Two });
+				await vscode.window.showTextDocument(targetDocument, { viewColumn: vscode.ViewColumn.Two, preserveFocus: true });
 				log(`Opened ${convertedFileName} in column two.`);
 			} catch (error) {
 				log(`File not found: ${targetFilePath} - ${error}`);
 			} finally {
-				setTimeout(() => (isExtensionTriggered = false), 100);
+				setTimeout(() => {
+					isExtensionTriggered = false;
+					if (originalEditor) {
+						vscode.window.showTextDocument(originalEditor.document, { viewColumn: vscode.ViewColumn.One, preserveFocus: false });
+					}
+				}, 100);
 			}
 		}
 	});
