@@ -46,37 +46,35 @@ function detectFileNameType(fileName) {
 }
 
 function convertFileName(fileName, sourceFormat, targetFormat, targetExtension) {
-	// Ensure we remove the extension correctly by subtracting the extension's length
 	const extensionLength = path.extname(fileName).length;
-	const baseName = fileName.slice(0, -extensionLength); // Now we subtract the exact length of the extension
+	const baseName = fileName.slice(0, -extensionLength);
 
 	let convertedName = sourceFormat.prefix ? baseName.slice(sourceFormat.prefix.length) : baseName;
 
-	// Log the baseName to verify it's correct
 	log(`Base name without extension: ${baseName}`);
 
 	const convertFunction = fileFormatFunctions[targetFormat.format] || (() => baseName);
 	convertedName = convertFunction(convertedName);
 
-	// Log the convertedName to verify the transformation
 	log(`Converted name before adding extension: ${convertedName}`);
 
 	if (targetFormat.prefix) {
 		convertedName = targetFormat.prefix + convertedName;
 	}
 
-	// Log the final filename before return
 	log(`Final converted name with extension: ${convertedName + targetExtension}`);
 
 	return `${convertedName}${targetExtension}`;
 }
 
 async function activate(context) {
-	let disposable = vscode.workspace.onDidOpenTextDocument(async (document) => {
-		if (isExtensionTriggered) {
-			log(`Skipped opening by extension: ${document.uri.fsPath}`);
+	let disposable = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
+		if (isExtensionTriggered || !editor) {
 			return;
 		}
+
+		const document = editor.document;
+		log(`Switched to tab: ${document.uri.fsPath}`);
 
 		const rootPath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0 ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
 
@@ -96,16 +94,13 @@ async function activate(context) {
 			return;
 		}
 
-		let documentName = document.uri.fsPath.replace(/\.git$/, "");
+		const documentName = document.uri.fsPath.replace(/\.git$/, "");
 		log(`Processing ${documentName}...`);
 
 		const fileExtension = path.extname(documentName);
 		if (![".ts", ".tsx", ".js", ".jsx", ".html", ".css", ".scss"].includes(fileExtension)) {
 			return;
 		}
-
-		// Save the active editor before any operations
-		const originalEditor = vscode.window.activeTextEditor;
 
 		for (const pair of directoryPairs) {
 			const directory1 = pair.directory1.path;
@@ -140,9 +135,6 @@ async function activate(context) {
 			} finally {
 				setTimeout(() => {
 					isExtensionTriggered = false;
-					if (originalEditor) {
-						vscode.window.showTextDocument(originalEditor.document, { viewColumn: vscode.ViewColumn.One, preserveFocus: false });
-					}
 				}, 100);
 			}
 		}
