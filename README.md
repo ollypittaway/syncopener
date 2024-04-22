@@ -52,11 +52,19 @@ The `.syncopener` file should contain an array of objects, each representing a p
     {
         "directory1": {
             "path": "/path/to/first/directory",
-            "extension": ".js"
+            "extension": ".jsx",
+			"fileFormat": {
+				"format": "pascal-case",
+				"prefix": ""
+			}
         },
         "directory2": {
             "path": "/path/to/second/directory",
-            "extension": ".ts"
+            "extension": ".scss",
+			"fileFormat": {
+				"format": "kebab-case",
+				"prefix": "_"
+			}
         }
     },
     {
@@ -77,11 +85,19 @@ The `.syncopener` file should contain an array of objects, each representing a p
     {
         "directory1": {
             "path": "\\path\\to\\first\\directory",
-            "extension": ".js"
+            "extension": ".jsx",
+			"fileFormat": {
+				"format": "pascal-case",
+				"prefix": ""
+			}
         },
         "directory2": {
             "path": "\\path\\to\\second\\directory",
-            "extension": ".ts"
+            "extension": ".scss",
+			"fileFormat": {
+				"format": "kebab-case",
+				"prefix": "_"
+			}
         }
     },
     {
@@ -95,12 +111,51 @@ The `.syncopener` file should contain an array of objects, each representing a p
 ]
 ```
 
-
 - **path:**
 The relative path from the root of the workspace to the directory.
 
 - **extension (optional):** 
 If specified, the extension transformation will apply when switching between files in these directories. This is useful when working on Front-End styling. For example: link the initial directory with ".jsx" extension and the second directory as ".scss" and it will open the files simulatenously. **Files must be called the same other than the extension.**
+
+- **fileFormat (optional):**
+  To accommodate variations in file naming conventions, you have the option to specify the file format using one of the following styles:
+  
+  - CamelCase
+  - PascalCase
+  - KebabCase
+  - SnakeCase
+  
+  This can be configured in the `fileFormat.format` parameter. You can also define `fileFormat.prefix` to determine if the files will have a prefix.
+  
+  This can be useful for the following scenarios:
+  
+  - JSX files being used to structure the styling with the path and naming convention `"src/components/NavigationLinks.jsx"`
+  - SCSS files being used to structure the styling with the path and naming convention `"src/assets/scss/_navigation-links.jsx"`
+
+	**Please Note: If the file fileformat is set with one of the directories, you will need to write the fileFormat for the other directory otherwise it will assume it is the same layout.**
+  
+	```json
+	[
+		{
+			"directory1": {
+				"path": "/src/components",
+				"extension": ".jsx",
+				"fileFormat": {
+					"format": "pascal-case",
+					"prefix": ""
+				}
+			},
+			"directory2": {
+				"path": "/src/assets/scss",
+				"extension": ".scss",
+				"fileFormat": {
+					"format": "kebab-case",
+					"prefix": "_"
+				}
+			}
+		}
+	]
+	```
 
 
 ## Examples
@@ -118,6 +173,12 @@ For files with different extensions (e.g .jsx and .scss) define the `extension` 
 	<img src="previews/DifferentExtension.gif">
 </p>
 
+
+For files with different naming conventions (e.g `NavigationLinks.jsx` and `_navigation-links.scss` you can define using the difference using the `fileFormat` configuration option as shown here:
+
+<p align="center">
+	<img src="previews/FileFormat.gif">
+</p>
 
 ## Usage
 

@@ -3,118 +3,142 @@ const path = require("path");
 const fs = require("fs");
 
 const outputChannel = vscode.window.createOutputChannel("SyncOpener");
+let isExtensionTriggered = false;
 
-let isExtensionTriggered = false; // Global flag to indicate if the opening is triggered by the extension
+function log(message) {
+	const timestamp = new Date().toLocaleTimeString();
+	outputChannel.appendLine(`[${timestamp}] ${message}`);
+}
+
+const fileFormatFunctions = {
+	"camel-case": (str) => str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase()),
+	"pascal-case": (str) => str.replace(/(^|[^a-zA-Z0-9]+)(.)/g, (_, __, chr) => chr.toUpperCase()),
+	"kebab-case": (str) =>
+		str
+			.replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+			.replace(/[\s_]+/g, "-")
+			.toLowerCase(),
+	"snake-case": (str) =>
+		str
+			.replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+			.replace(/[\s\-]+/g, "_")
+			.toLowerCase()
+};
+
+function detectFileNameType(fileName) {
+	const regexes = {
+		"camel-case": /^[a-z][a-zA-Z]*\.\w+$/,
+		"pascal-case": /^[A-Z][a-zA-Z]*\.\w+$/,
+		"kebab-case": /^[a-z]+(-[a-z]+)*\.\w+$/,
+		"snake-case": /^[a-z]+(_[a-z]+)*\.\w+$/
+	};
+	const matches = fileName.match(/^[^a-zA-Z0-9]*(?=[a-zA-Z])/);
+	const prefix = (matches && matches[0]) || "";
+
+	const cleanFileName = fileName.slice(prefix.length);
+
+	for (const [format, regex] of Object.entries(regexes)) {
+		if (regex.test(cleanFileName)) {
+			return { prefix, format };
+		}
+	}
+	return { prefix, format: "unknown" };
+}
+
+function convertFileName(fileName, sourceFormat, targetFormat, targetExtension) {
+	// Ensure we remove the extension correctly by subtracting the extension's length
+	const extensionLength = path.extname(fileName).length;
+	const baseName = fileName.slice(0, -extensionLength); // Now we subtract the exact length of the extension
+
+	let convertedName = sourceFormat.prefix ? baseName.slice(sourceFormat.prefix.length) : baseName;
+
+	// Log the baseName to verify it's correct
+	log(`Base name without extension: ${baseName}`);
+
+	const convertFunction = fileFormatFunctions[targetFormat.format] || (() => baseName);
+	convertedName = convertFunction(convertedName);
+
+	// Log the convertedName to verify the transformation
+	log(`Converted name before adding extension: ${convertedName}`);
+
+	if (targetFormat.prefix) {
+		convertedName = targetFormat.prefix + convertedName;
+	}
+
+	// Log the final filename before return
+	log(`Final converted name with extension: ${convertedName + targetExtension}`);
+
+	return `${convertedName}${targetExtension}`;
+}
 
 async function activate(context) {
 	let disposable = vscode.workspace.onDidOpenTextDocument(async (document) => {
 		if (isExtensionTriggered) {
-			Log(`Skipping document opened by the extension: ${document.uri.fsPath}`);
-
-			return;
-		} // Skip processing if the document is opened by the extension
-
-		const workspaceFolders = vscode.workspace.workspaceFolders;
-		if (!workspaceFolders) {
-			return; // Exit if no workspace is opened
-		}
-
-		let documentName = document.uri.fsPath;
-
-		if (documentName.endsWith(".git")) {
-			documentName = documentName.replace(".git", ""); // Remove .git from the file name
-		}
-
-		const validExtensions = [".ts", ".tsx", ".js", ".jsx", ".html", ".css", ".scss"];
-
-		const fileExtension = path.extname(documentName).toLowerCase(); // Handle extensions in a case-insensitive manner
-
-		if (!validExtensions.includes(fileExtension)) {
+			log(`Skipped opening by extension: ${document.uri.fsPath}`);
 			return;
 		}
 
-		Log(`Checking file with extension: ${fileExtension}`);
+		const rootPath = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0 ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
 
-		Log(`All checks passed`);
+		if (!rootPath) return;
 
-		const rootPath = workspaceFolders[0].uri.fsPath;
 		const syncFilePath = path.join(rootPath, ".syncopener");
-		let directoryPairs = [];
-
-		if (fs.existsSync(syncFilePath)) {
-			try {
-				const data = fs.readFileSync(syncFilePath, "utf8");
-				directoryPairs = JSON.parse(data);
-			} catch (error) {
-				Log("Error reading .syncopener file - " + error);
-				return;
-			}
-		} else {
-			Log("No .syncopener file found, skipping.");
-			return; // Exit if the .syncopener file does not exist
+		if (!fs.existsSync(syncFilePath)) {
+			log("No .syncopener file found, skipping.");
+			return;
 		}
 
-		let openedFilePath = documentName;
-		const originalEditor = vscode.window.activeTextEditor; // Keep reference to the original editor
+		let directoryPairs;
+		try {
+			directoryPairs = JSON.parse(fs.readFileSync(syncFilePath, "utf8"));
+		} catch (error) {
+			log(`Error reading .syncopener file: ${error}`);
+			return;
+		}
 
-		Log(`Working on ${openedFilePath}...`);
+		let documentName = document.uri.fsPath.replace(/\.git$/, "");
+		log(`Processing ${documentName}...`);
+
+		// Extract the extension from the document URI once, correctly handling dot files or hidden extensions
+		const fileExtension = path.extname(documentName);
+		if (![".ts", ".tsx", ".js", ".jsx", ".html", ".css", ".scss"].includes(fileExtension)) {
+			return;
+		}
 
 		for (const pair of directoryPairs) {
 			const directory1 = pair.directory1.path;
 			const directory2 = pair.directory2.path;
-			const directory1Extension = pair.directory1.extension || path.extname(openedFilePath); // Default to the file's current extension
-			const directory2Extension = pair.directory2.extension || path.extname(openedFilePath);
+			const targetDirectory = documentName.includes(directory1) ? directory2 : documentName.includes(directory2) ? directory1 : null;
+			if (!targetDirectory) continue;
 
-			let targetDirectory, targetExtension;
+			const targetExtension = documentName.includes(directory1) ? pair.directory2.extension || fileExtension : pair.directory1.extension || fileExtension;
+			const openedFileName = path.basename(documentName, fileExtension); // Strip the extension correctly
+			log(`Opened file name without extension: ${openedFileName}`);
 
-			if (openedFilePath.includes(directory1)) {
-				targetDirectory = directory2;
-				targetExtension = directory2Extension;
-			} else if (openedFilePath.includes(directory2)) {
-				targetDirectory = directory1;
-				targetExtension = directory1Extension;
-			} else {
-				continue; // Skip if the file path does not include either directory
-			}
+			const sourceFormat = detectFileNameType(openedFileName + fileExtension);
+			const targetFormat = documentName.includes(directory1) ? pair.directory2.fileFormat || sourceFormat : pair.directory1.fileFormat || sourceFormat;
 
-			Log(`Looking in ${targetDirectory} for ${targetExtension} files...`);
+			const convertedFileName = convertFileName(openedFileName + fileExtension, sourceFormat, targetFormat, targetExtension);
 
-			let openedFileName = path.basename(openedFilePath, path.extname(openedFilePath)) + targetExtension;
+			const targetFilePath = path.join(rootPath, targetDirectory, convertedFileName);
+			log(`Trying to open file: ${targetFilePath}`); // Debug line to see what file path is being constructed
 
-			let targetFilePath = path.join(rootPath, targetDirectory, openedFileName);
-			const targetUri = vscode.Uri.file(targetFilePath);
-
-			if (isFileAlreadyOpen(targetFilePath)) {
-				Log(`File already open: ${targetFilePath}`);
-				// Optionally, focus the editor where the file is open
-				const editor = vscode.window.visibleTextEditors.find((editor) => editor.document.uri.fsPath === targetFilePath);
-				if (editor) {
-					vscode.window.showTextDocument(editor.document, { viewColumn: editor.viewColumn, preserveFocus: false });
-				}
-				return; // Skip the opening process
+			if (vscode.window.visibleTextEditors.some((editor) => editor.document.uri.fsPath === targetFilePath)) {
+				log(`File already open: ${targetFilePath}`);
+				continue;
 			}
 
 			try {
 				isExtensionTriggered = true;
-				Log("Extension triggered flag set");
-				const targetDocument = await vscode.workspace.openTextDocument(targetUri);
+				const targetDocument = await vscode.workspace.openTextDocument(vscode.Uri.file(targetFilePath));
 				await vscode.window.showTextDocument(targetDocument, { viewColumn: vscode.ViewColumn.Two });
+				log(`Opened ${convertedFileName} in column two.`);
 			} catch (error) {
-				console.error(`File not found: ${targetFilePath}`);
+				log(`File not found: ${targetFilePath} - ${error}`);
 			} finally {
-				setTimeout(() => {
-					isExtensionTriggered = false; // Reset flag after operation
-					Log("Extension triggered flag reset");
-				}, 100);
+				setTimeout(() => (isExtensionTriggered = false), 100);
 			}
-
-			if (originalEditor) {
-				await vscode.window.showTextDocument(originalEditor.document, { viewColumn: vscode.ViewColumn.One });
-			}
-
-			break; // Exit the loop after finding the matching directory
 		}
-		Log("\n\n========================\n\n", false);
 	});
 
 	context.subscriptions.push(disposable);
@@ -126,17 +150,3 @@ module.exports = {
 	activate,
 	deactivate
 };
-
-const Log = (message, dateShown = true) => {
-	const date = new Date();
-	const prettyDate = `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-	if (dateShown) {
-		outputChannel.appendLine(`${prettyDate} => ${message}`);
-		return;
-	}
-	outputChannel.appendLine(`${message}`);
-};
-
-function isFileAlreadyOpen(filePath) {
-	return vscode.window.visibleTextEditors.some((editor) => editor.document.uri.fsPath === filePath);
-}
