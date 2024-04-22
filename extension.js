@@ -77,6 +77,11 @@ async function activate(context) {
 			return;
 		}
 
+		if (editor.viewColumn === vscode.ViewColumn.Two) {
+			log("Skipped processing for editor in the right column.");
+			return;
+		}
+
 		const document = editor.document;
 		log(`Switched to tab: ${document.uri.fsPath}`);
 
