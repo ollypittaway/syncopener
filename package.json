@@ -3,7 +3,7 @@
 	"displayName": "SyncOpener",
 	"description": "Link directories to open files of the same name with a single click.",
 	"publisher": "Pittawaydev",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"engines": {
 	  "vscode": "^1.87.0"
 	},
